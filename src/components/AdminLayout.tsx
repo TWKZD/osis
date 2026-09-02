@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, LogOut, MessageSquare, Menu, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -20,9 +20,7 @@ export default function AdminLayout() {
 
   // Redirect if not logged in
   if (localStorage.getItem('adminAuth') !== 'true') {
-    // In a real app we'd use a more robust auth check. For this demo, just redirect in a timeout to avoid render cycle issues
-    setTimeout(() => navigate('/pengurus/login'), 0);
-    return null;
+    return <Navigate to="/pengurus/login" replace />;
   }
 
   return (
@@ -31,7 +29,7 @@ export default function AdminLayout() {
       <div className="md:hidden flex items-center justify-between p-4 bg-slate-900 text-white sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
-            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
+            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
           </div>
           <h2 className="font-bold text-lg">Admin Panel</h2>
         </div>
@@ -58,7 +56,7 @@ export default function AdminLayout() {
       )}>
         <div className="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
           <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
-            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
+            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
           </div>
           <div>
             <h2 className="font-bold text-lg leading-tight">Admin Panel</h2>

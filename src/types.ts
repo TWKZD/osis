@@ -1,4 +1,4 @@
-export type AspirationCategory = 'Fasilitas' | 'Akademik' | 'Kegiatan' | 'Lainnya';
+export type AspirationCategory = 'Saran' | 'Kritik' | 'Pertanyaan' | 'Lainnya';
 export type AspirationStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface Aspiration {

@@ -12,7 +12,7 @@ export default function PapanAspirasi() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<AspirationCategory | 'Semua'>('Semua');
 
-  const categories: (AspirationCategory | 'Semua')[] = ['Semua', 'Fasilitas', 'Akademik', 'Kegiatan', 'Lainnya'];
+  const categories: (AspirationCategory | 'Semua')[] = ['Semua', 'Saran', 'Kritik', 'Pertanyaan', 'Lainnya'];
 
   const approvedAspirations = aspirations.filter(a => a.status === 'Approved');
 
@@ -113,7 +113,7 @@ export default function PapanAspirasi() {
                 <div className="border-t border-slate-100 bg-sky-50/50 p-6">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm overflow-hidden">
-                      <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
+                      <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
                     </div>
                     <span className="text-sm font-bold text-sky-900">Tanggapan OSIS</span>
                   </div>
@@ -132,7 +132,7 @@ export default function PapanAspirasi() {
           className="text-center py-24 bg-white rounded-3xl border border-slate-200 border-dashed"
         >
           <div className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale">
-            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain" />
+            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">Belum ada aspirasi</h3>
           <p className="text-slate-500 max-w-md mx-auto">

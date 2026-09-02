@@ -28,7 +28,7 @@ export default function AdminLogin() {
         
         <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-2xl">
           <div className="w-20 h-20 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner overflow-hidden">
-            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
+            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-cover" />
           </div>
           
           <div className="text-center mb-8">

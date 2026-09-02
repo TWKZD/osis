@@ -66,7 +66,7 @@ export default function Mading() {
           className="text-center py-24 bg-white rounded-3xl border border-slate-200 border-dashed"
         >
           <div className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale">
-            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain" />
+            <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">Belum ada pengumuman</h3>
           <p className="text-slate-500 max-w-md mx-auto">

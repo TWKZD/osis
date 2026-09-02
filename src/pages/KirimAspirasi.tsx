@@ -95,7 +95,7 @@ export default function KirimAspirasi() {
           transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           className="w-32 h-32 mx-auto mb-6"
         >
-          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain drop-shadow-xl" />
+          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Logo OSIS SMAN 1 Kemangkon" className="w-full h-full object-contain drop-shadow-xl" />
         </motion.div>
         
         <motion.div
@@ -126,7 +126,7 @@ export default function KirimAspirasi() {
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
           className="w-32 h-32 mx-auto mb-6"
         >
-          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Maskot OSIS" className="w-full h-full object-contain drop-shadow-xl grayscale opacity-80" />
+          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Maskot OSIS" className="w-full h-full object-contain drop-shadow-xl grayscale opacity-80" />
         </motion.div>
         
         <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 relative">
@@ -162,7 +162,7 @@ export default function KirimAspirasi() {
           whileHover={{ rotate: [0, -10, 10, -10, 0] }}
           className="w-24 h-24 shrink-0 z-10"
         >
-          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788310116346-file_000000007ed881faae311454aeec136b.png" alt="Maskot OSIS" className="w-full h-full object-contain drop-shadow-md" />
+          <img src="https://raw.githubusercontent.com/dapidd12/storage/main/tes/1788314699811-20260902_090434.png" alt="Maskot OSIS" className="w-full h-full object-contain drop-shadow-md" />
         </motion.div>
         
         <div className="bg-sky-100 p-5 rounded-3xl rounded-tl-sm sm:rounded-bl-sm sm:rounded-tl-3xl relative w-full border border-sky-200">
@@ -189,7 +189,7 @@ export default function KirimAspirasi() {
         <div className="relative z-10">
           <label className="block text-sm font-bold text-slate-800 mb-4">Topik curhatannya tentang apa nih?</label>
           <div className="flex flex-wrap gap-3">
-            {(['Fasilitas', 'Akademik', 'Kegiatan', 'Lainnya'] as AspirationCategory[]).map((cat, i) => (
+            {(['Saran', 'Kritik', 'Pertanyaan', 'Lainnya'] as AspirationCategory[]).map((cat, i) => (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
