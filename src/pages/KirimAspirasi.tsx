@@ -41,7 +41,7 @@ export default function KirimAspirasi() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject || !message || !category) {
       alert("Oops! Jangan lupa pilih kategori dulu ya.");
@@ -66,21 +66,28 @@ export default function KirimAspirasi() {
       return;
     }
 
-    data.count += 1;
-    localStorage.setItem('aspirationLimit', JSON.stringify(data));
-    
-    addAspiration({
-      category,
-      subject,
-      message,
-      isAnonymous,
-      authorName: isAnonymous ? undefined : authorName,
-    });
-    
-    setSubmitted(true);
-    setTimeout(() => {
-      navigate('/papan');
-    }, 2500);
+    try {
+      const payload = {
+        category,
+        subject,
+        message,
+        isAnonymous,
+        ...(isAnonymous ? {} : { authorName }),
+      };
+
+      await addAspiration(payload);
+      
+      data.count += 1;
+      localStorage.setItem('aspirationLimit', JSON.stringify(data));
+      
+      setSubmitted(true);
+      setTimeout(() => {
+        navigate('/papan');
+      }, 2500);
+    } catch (error) {
+      console.error("Gagal mengirim:", error);
+      alert("Ups! Gagal mengirim aspirasi, pastikan koneksi lancar. Coba lagi ya.");
+    }
   };
 
   if (submitted) {
