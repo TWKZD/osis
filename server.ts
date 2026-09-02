@@ -4,7 +4,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { createServer as createViteServer } from "vite";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import fs from "fs";
 
 // Initialize Firebase for the server using the applet config
@@ -36,13 +36,9 @@ async function startServer() {
   const BAD_WORDS = ["anjing", "babi", "goblok", "tolol", "bangsat", "bodoh", "jancok", "kontol", "memek"];
 
   // API Endpoint to submit aspirations securely
-  app.post("/api/aspirations", async (req, res) => {
+  app.post("/api/aspirations", apiLimiter, async (req, res) => {
     try {
-      const { category, subject, message, isAnonymous, authorName, captcha, studentId } = req.body;
-
-      if (!studentId || studentId.trim() === "") {
-        return res.status(400).json({ error: "NISN atau ID Siswa wajib diisi untuk mencegah spam." });
-      }
+      const { category, subject, message, isAnonymous, authorName, captcha } = req.body;
 
       // 3. Captcha Verification (Math Captcha)
       if (!captcha || captcha.num1 + captcha.num2 !== parseInt(captcha.answer)) {
@@ -56,47 +52,22 @@ async function startServer() {
         return res.status(400).json({ error: "Maaf, pesan Anda mengandung kata-kata yang tidak pantas. Harap gunakan bahasa yang sopan." });
       }
 
-      const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-      const limitRef = doc(db, "limits", `${studentId}_${dateStr}`);
-      const aspirationRef = doc(collection(db, "aspirations"));
+      // Prepare payload
+      const payload = {
+        category,
+        subject,
+        message,
+        isAnonymous,
+        ...(isAnonymous ? {} : { authorName }),
+        status: "Pending",
+        createdAt: serverTimestamp(),
+        // SECRET KEY: this must match the Firestore security rules to allow writes
+        serverSecret: "osis_secure_2026",
+      };
 
-      await runTransaction(db, async (transaction) => {
-        const limitDoc = await transaction.get(limitRef);
-        let currentCount = 0;
-        
-        if (limitDoc.exists()) {
-          currentCount = limitDoc.data().count || 0;
-        }
-        
-        if (currentCount >= 2) {
-          return Promise.reject(new Error("LIMIT_REACHED"));
-        }
-
-        // Increment count
-        transaction.set(limitRef, { count: currentCount + 1 }, { merge: true });
-
-        // Prepare payload
-        const payload = {
-          category,
-          subject,
-          message,
-          isAnonymous,
-          // We omit studentId from the public document to protect identity if anonymous
-          ...(isAnonymous ? {} : { authorName }),
-          status: "Pending",
-          createdAt: serverTimestamp(),
-          // SECRET KEY: this must match the Firestore security rules to allow writes
-          serverSecret: "osis_secure_2026",
-        };
-        
-        transaction.set(aspirationRef, payload);
-      });
-
+      await addDoc(collection(db, "aspirations"), payload);
       res.json({ success: true, message: "Aspirasi berhasil dikirim" });
-    } catch (error: any) {
-      if (error.message === "LIMIT_REACHED") {
-        return res.status(429).json({ error: "Kamu sudah mencapai batas maksimal 2 aspirasi hari ini. Coba lagi besok ya!" });
-      }
+    } catch (error) {
       console.error("Error saving aspiration:", error);
       res.status(500).json({ error: "Gagal memproses aspirasi ke database." });
     }

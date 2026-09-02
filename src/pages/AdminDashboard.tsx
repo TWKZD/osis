@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
-import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp, PieChart as PieChartIcon, Archive } from 'lucide-react';
+import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp, PieChart as PieChartIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
@@ -11,7 +11,6 @@ export default function AdminDashboard() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
   const [activeTab, setActiveTab] = useState<'aspirasi' | 'mading'>('aspirasi');
-  const [filterStatus, setFilterStatus] = useState<'All' | 'Pending' | 'Approved' | 'Rejected' | 'Archived'>('All');
   
   // Announcement form state
   const [madingTitle, setMadingTitle] = useState('');
@@ -23,10 +22,7 @@ export default function AdminDashboard() {
     pending: aspirations.filter(a => a.status === 'Pending').length,
     approved: aspirations.filter(a => a.status === 'Approved').length,
     rejected: aspirations.filter(a => a.status === 'Rejected').length,
-    archived: aspirations.filter(a => a.status === 'Archived').length,
   };
-
-  const filteredAspirations = aspirations.filter(a => filterStatus === 'All' || a.status === filterStatus);
 
   // Prepare data for the chart
   const categoryCounts = aspirations.reduce((acc, curr) => {
@@ -146,33 +142,15 @@ export default function AdminDashboard() {
       {activeTab === 'aspirasi' ? (
         /* Aspirations List */
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 sm:px-8 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="p-6 sm:px-8 border-b border-slate-200 flex justify-between items-center">
             <h2 className="text-xl font-bold text-slate-900">Daftar Aspirasi Terbaru</h2>
-            
-            {/* Filter Buttons */}
-            <div className="flex flex-wrap gap-2">
-              {['All', 'Pending', 'Approved', 'Rejected', 'Archived'].map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status as any)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-sm font-bold transition-all border",
-                    filterStatus === status 
-                      ? "bg-slate-900 text-white border-slate-900 shadow-sm" 
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                  )}
-                >
-                  {status === 'All' ? 'Semua' : status}
-                </button>
-              ))}
-            </div>
           </div>
           
           <div className="divide-y divide-slate-100">
-          {filteredAspirations.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">Belum ada aspirasi masuk untuk filter ini.</div>
+          {aspirations.length === 0 ? (
+            <div className="p-12 text-center text-slate-500">Belum ada aspirasi masuk.</div>
           ) : (
-            filteredAspirations.map((aspiration) => (
+            aspirations.map((aspiration) => (
               <div key={aspiration.id} className="p-6 sm:px-8 hover:bg-slate-50/50 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                   <div className="flex-1">
@@ -247,21 +225,6 @@ export default function AdminDashboard() {
                       {expandedId === aspiration.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                     
-                    {aspiration.status === 'Approved' && (
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Arsipkan aspirasi ini? (Tidak akan tampil di Papan Publik lagi)')) {
-                            updateAspirationStatus(aspiration.id, 'Archived');
-                          }
-                        }}
-                        className="flex items-center gap-2 px-3 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-800 rounded-xl transition-colors text-sm font-bold"
-                        title="Arsipkan"
-                      >
-                        <Archive className="w-4 h-4" />
-                        Arsipkan
-                      </button>
-                    )}
-
                     <button
                       onClick={() => {
                         if (window.confirm('Yakin ingin menghapus aspirasi ini?')) {

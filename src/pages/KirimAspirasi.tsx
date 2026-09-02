@@ -22,7 +22,6 @@ export default function KirimAspirasi() {
   const [category, setCategory] = useState<AspirationCategory | null>(null);
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [studentId, setStudentId] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [authorName, setAuthorName] = useState('');
 
@@ -34,6 +33,19 @@ export default function KirimAspirasi() {
   const [limitReached, setLimitReached] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const logicalDay = getLogicalDay();
+    const stored = localStorage.getItem('aspirationLimit');
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        if (data.day === logicalDay && data.count >= 2) {
+          setLimitReached(true);
+        }
+      } catch (e) {}
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject || !message || !category) {
@@ -41,13 +53,26 @@ export default function KirimAspirasi() {
       return;
     }
 
-    if (!studentId) {
-      alert("NISN atau ID Siswa wajib diisi untuk mencegah spam.");
+    if (!captchaAnswer) {
+      alert("Oops! Jangan lupa isi captcha keamanan ya.");
       return;
     }
 
-    if (!captchaAnswer) {
-      alert("Oops! Jangan lupa isi captcha keamanan ya.");
+    // Rate Limit Check
+    const logicalDay = getLogicalDay();
+    const stored = localStorage.getItem('aspirationLimit');
+    let data = { count: 0, day: logicalDay };
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.day === logicalDay) {
+          data = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (data.count >= 2) {
+      setLimitReached(true);
       return;
     }
 
@@ -57,7 +82,6 @@ export default function KirimAspirasi() {
         category,
         subject,
         message,
-        studentId,
         isAnonymous,
         ...(isAnonymous ? {} : { authorName }),
       };
@@ -69,6 +93,9 @@ export default function KirimAspirasi() {
       };
 
       await addAspiration(payload, captcha);
+      
+      data.count += 1;
+      localStorage.setItem('aspirationLimit', JSON.stringify(data));
       
       setSubmitted(true);
       setTimeout(() => {
@@ -216,22 +243,6 @@ export default function KirimAspirasi() {
         </div>
 
         <div className="relative z-10 space-y-6">
-          <div>
-            <label htmlFor="studentId" className="block text-sm font-bold text-slate-800 mb-2">
-              NISN / ID Siswa 🔒
-            </label>
-            <p className="text-xs text-slate-500 mb-2">Ini wajib diisi untuk mencegah spam (tetap rahasia di Papan Publik).</p>
-            <input
-              id="studentId"
-              type="text"
-              required
-              value={studentId}
-              onChange={e => setStudentId(e.target.value)}
-              placeholder="Contoh: 0012345678"
-              className="w-full px-5 py-4 bg-slate-50/50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100 transition-all font-medium text-slate-700 placeholder:text-slate-400"
-            />
-          </div>
-
           <div>
             <label htmlFor="subject" className="block text-sm font-bold text-slate-800 mb-2">
               Beri judul singkat ya ✍️

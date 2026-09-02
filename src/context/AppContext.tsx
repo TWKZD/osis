@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, where, limit } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, auth } from '../lib/firebase';
 import { Aspiration, Announcement } from '../types';
@@ -36,10 +36,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     // Listen to Aspirations (Admin sees all, Public sees only Approved)
-    // We add limit() to prevent enormous reads. Public is sorted client-side since composite index might be missing.
     const qAspirations = user
-      ? query(collection(db, 'aspirations'), orderBy('createdAt', 'desc'), limit(200))
-      : query(collection(db, 'aspirations'), where('status', '==', 'Approved'), limit(150));
+      ? query(collection(db, 'aspirations'), orderBy('createdAt', 'desc'))
+      : query(collection(db, 'aspirations'), where('status', '==', 'Approved'));
 
     const unsubscribeAspirations = onSnapshot(qAspirations, (snapshot) => {
       let data = snapshot.docs.map(doc => {
