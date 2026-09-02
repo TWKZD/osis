@@ -25,13 +25,8 @@ export default function KirimAspirasi() {
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [authorName, setAuthorName] = useState('');
 
-  const [captchaNum1, setCaptchaNum1] = useState(Math.floor(Math.random() * 10) + 1);
-  const [captchaNum2, setCaptchaNum2] = useState(Math.floor(Math.random() * 10) + 1);
-  const [captchaAnswer, setCaptchaAnswer] = useState('');
-
   const [submitted, setSubmitted] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const logicalDay = getLogicalDay();
@@ -53,11 +48,6 @@ export default function KirimAspirasi() {
       return;
     }
 
-    if (!captchaAnswer) {
-      alert("Oops! Jangan lupa isi captcha keamanan ya.");
-      return;
-    }
-
     // Rate Limit Check
     const logicalDay = getLogicalDay();
     const stored = localStorage.getItem('aspirationLimit');
@@ -76,7 +66,6 @@ export default function KirimAspirasi() {
       return;
     }
 
-    setLoading(true);
     try {
       const payload = {
         category,
@@ -86,13 +75,7 @@ export default function KirimAspirasi() {
         ...(isAnonymous ? {} : { authorName }),
       };
 
-      const captcha = {
-        num1: captchaNum1,
-        num2: captchaNum2,
-        answer: captchaAnswer
-      };
-
-      await addAspiration(payload, captcha);
+      await addAspiration(payload);
       
       data.count += 1;
       localStorage.setItem('aspirationLimit', JSON.stringify(data));
@@ -101,15 +84,9 @@ export default function KirimAspirasi() {
       setTimeout(() => {
         navigate('/papan');
       }, 2500);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Gagal mengirim:", error);
-      alert(error.message || "Ups! Gagal mengirim aspirasi, pastikan koneksi lancar. Coba lagi ya.");
-      // Reset captcha on failure
-      setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
-      setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
-      setCaptchaAnswer('');
-    } finally {
-      setLoading(false);
+      alert("Ups! Gagal mengirim aspirasi, pastikan koneksi lancar. Coba lagi ya.");
     }
   };
 
@@ -332,34 +309,14 @@ export default function KirimAspirasi() {
           </p>
         </motion.div>
 
-        <div className="relative z-10 bg-slate-50 p-5 rounded-2xl border border-slate-200">
-          <label className="block text-sm font-bold text-slate-800 mb-3">
-            Buktikan kamu manusia! 🤖
-          </label>
-          <div className="flex items-center gap-4">
-            <div className="px-4 py-3 bg-white border border-slate-200 rounded-xl font-mono text-lg font-bold text-slate-700 shadow-sm">
-              {captchaNum1} + {captchaNum2} =
-            </div>
-            <input
-              type="number"
-              required
-              value={captchaAnswer}
-              onChange={e => setCaptchaAnswer(e.target.value)}
-              placeholder="Hasil"
-              className="w-24 px-4 py-3 bg-white border-2 border-slate-100 rounded-xl focus:outline-none focus:border-sky-300 focus:ring-4 focus:ring-sky-100 transition-all font-bold text-slate-700"
-            />
-          </div>
-        </div>
-
         <motion.button
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           type="submit"
-          disabled={loading}
-          className="relative z-10 w-full flex items-center justify-center gap-2 py-4 px-4 bg-slate-900 hover:bg-slate-800 disabled:opacity-70 text-white font-bold rounded-2xl transition-all shadow-xl shadow-slate-900/20"
+          className="relative z-10 w-full flex items-center justify-center gap-2 py-4 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl transition-all shadow-xl shadow-slate-900/20"
         >
           <Send className="w-5 h-5" />
-          {loading ? 'Mengirim...' : 'Kirim Sekarang! 🚀'}
+          Kirim Sekarang! 🚀
         </motion.button>
       </motion.form>
     </div>

@@ -1,25 +1,17 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, LogOut, MessageSquare, Menu, X } from 'lucide-react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { useAppContext } from '../context/AppContext';
 import { cn } from '../lib/utils';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, authLoading } = useAppContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await signOut(auth);
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth');
     navigate('/pengurus/login');
   };
-
-  if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div></div>;
-  }
 
   // Simple auth check - don't render layout if on login page
   if (location.pathname === '/pengurus/login') {
@@ -27,7 +19,7 @@ export default function AdminLayout() {
   }
 
   // Redirect if not logged in
-  if (!user) {
+  if (localStorage.getItem('adminAuth') !== 'true') {
     return <Navigate to="/pengurus/login" replace />;
   }
 

@@ -1,40 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { KeyRound, ArrowLeft, Mail } from 'lucide-react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { KeyRound, ArrowLeft } from 'lucide-react';
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('admin@osis.com'); // Default admin
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-    
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
+    if (password === 'sangsaka2627') {
+      localStorage.setItem('adminAuth', 'true');
       navigate('/pengurus/dashboard');
-    } catch (err: any) {
-      // Auto-bootstrap for the default admin account if it doesn't exist yet
-      if ((err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') && email === 'admin@osis.com' && password === 'sangsaka2627') {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          navigate('/pengurus/dashboard');
-          return;
-        } catch (createErr: any) {
-          console.error("Gagal membuat akun admin:", createErr);
-          setError(createErr.message || 'Gagal menyiapkan akun admin');
-        }
-      } else {
-        setError('Kredensial salah atau tidak valid. Silakan coba lagi.');
-      }
-    } finally {
-      setLoading(false);
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 3000);
     }
   };
 
@@ -59,23 +39,6 @@ export default function AdminLogin() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-2">
-                Email Admin
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="admin@osis.com"
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">
                 Kata Sandi
               </label>
               <div className="relative">
@@ -87,20 +50,18 @@ export default function AdminLogin() {
                   placeholder="Masukkan kata sandi..."
                   className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900"
                   autoFocus
-                  required
                 />
               </div>
               {error && (
-                <p className="text-red-500 text-sm mt-2 font-medium animate-in fade-in">{error}</p>
+                <p className="text-red-500 text-sm mt-2 font-medium animate-in fade-in">Kata sandi salah. Silakan coba lagi.</p>
               )}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-slate-900 hover:bg-slate-800 disabled:opacity-70 text-white font-bold rounded-xl transition-all active:scale-[0.98]"
+              className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all active:scale-[0.98]"
             >
-              {loading ? 'Memeriksa...' : 'Masuk ke Dashboard'}
+              Masuk ke Dashboard
             </button>
           </form>
         </div>

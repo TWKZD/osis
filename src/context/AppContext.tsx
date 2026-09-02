@@ -1,15 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { db, auth } from '../lib/firebase';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { Aspiration, Announcement } from '../types';
 
 interface AppContextType {
-  user: User | null;
-  authLoading: boolean;
   aspirations: Aspiration[];
   announcements: Announcement[];
-  addAspiration: (data: any, captcha: any) => Promise<void>;
+  addAspiration: (aspiration: Omit<Aspiration, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   updateAspirationStatus: (id: string, status: Aspiration['status']) => Promise<void>;
   addResponse: (id: string, response: string) => Promise<void>;
   deleteAspiration: (id: string) => Promise<void>;
@@ -20,28 +17,14 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [aspirations, setAspirations] = useState<Aspiration[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
-  // Listen to Auth State
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setAuthLoading(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    // Listen to Aspirations (Admin sees all, Public sees only Approved)
-    const qAspirations = user
-      ? query(collection(db, 'aspirations'), orderBy('createdAt', 'desc'))
-      : query(collection(db, 'aspirations'), where('status', '==', 'Approved'));
-
+    // Listen to Aspirations
+    const qAspirations = query(collection(db, 'aspirations'), orderBy('createdAt', 'desc'));
     const unsubscribeAspirations = onSnapshot(qAspirations, (snapshot) => {
-      let data = snapshot.docs.map(doc => {
+      const data = snapshot.docs.map(doc => {
         const docData = doc.data();
         return {
           ...docData,
@@ -49,12 +32,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           createdAt: docData.createdAt?.toDate ? docData.createdAt.toDate().toISOString() : new Date().toISOString()
         } as Aspiration;
       });
-      
-      // Since we can't easily compound index 'status' and 'createdAt' for public, we sort it client-side
-      if (!user) {
-        data = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      }
-      
       setAspirations(data);
     });
 
@@ -76,19 +53,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubscribeAspirations();
       unsubscribeAnnouncements();
     };
-  }, [user]);
+  }, []);
 
-  const addAspiration = async (data: any, captcha: any) => {
-    const res = await fetch('/api/aspirations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, captcha })
+  const addAspiration = async (data: Omit<Aspiration, 'id' | 'createdAt' | 'status'>) => {
+    await addDoc(collection(db, 'aspirations'), {
+      ...data,
+      status: 'Pending',
+      createdAt: serverTimestamp()
     });
-    
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Terjadi kesalahan saat mengirim');
-    }
   };
 
   const updateAspirationStatus = async (id: string, status: Aspiration['status']) => {
@@ -118,8 +90,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <AppContext.Provider value={{ 
-       user, authLoading, aspirations, announcements, 
-       addAspiration, updateAspirationStatus, addResponse, deleteAspiration,
+      aspirations, announcements, 
+      addAspiration, updateAspirationStatus, addResponse, deleteAspiration,
       addAnnouncement, deleteAnnouncement 
     }}>
       {children}
