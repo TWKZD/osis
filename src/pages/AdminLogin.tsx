@@ -9,7 +9,7 @@ export default function AdminLogin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'osis123') {
+    if (password === 'sangsaka2627') {
       localStorage.setItem('adminAuth', 'true');
       navigate('/pengurus/dashboard');
     } else {
@@ -47,7 +47,7 @@ export default function AdminLogin() {
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Petunjuk: osis123"
+                  placeholder="Masukkan kata sandi..."
                   className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900"
                   autoFocus
                 />

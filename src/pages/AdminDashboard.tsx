@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
-import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp, PieChart as PieChartIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function AdminDashboard() {
   const { aspirations, updateAspirationStatus, addResponse, deleteAspiration, announcements, addAnnouncement, deleteAnnouncement } = useAppContext();
@@ -22,6 +23,19 @@ export default function AdminDashboard() {
     approved: aspirations.filter(a => a.status === 'Approved').length,
     rejected: aspirations.filter(a => a.status === 'Rejected').length,
   };
+
+  // Prepare data for the chart
+  const categoryCounts = aspirations.reduce((acc, curr) => {
+    acc[curr.category] = (acc[curr.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.keys(categoryCounts).map(key => ({
+    name: key,
+    value: categoryCounts[key]
+  }));
+
+  const COLORS = ['#38bdf8', '#fbbf24', '#34d399', '#f87171', '#818cf8'];
 
   const handleResponseSubmit = (e: React.FormEvent, id: string) => {
     e.preventDefault();
@@ -67,6 +81,41 @@ export default function AdminDashboard() {
           <p className="text-4xl font-extrabold text-red-700 mt-2">{stats.rejected}</p>
         </div>
       </div>
+
+      {/* Chart Section */}
+      {aspirations.length > 0 && (
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+          <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <PieChartIcon className="w-5 h-5 text-sky-500" />
+            Distribusi Kategori Aspirasi
+          </h2>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#0f172a', fontWeight: 'bold' }}
+                />
+                <Legend verticalAlign="bottom" height={36}/>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl max-w-sm">
