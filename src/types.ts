@@ -1,5 +1,5 @@
 export type AspirationCategory = 'Saran' | 'Kritik' | 'Pertanyaan' | 'Lainnya';
-export type AspirationStatus = 'Pending' | 'Approved' | 'Rejected';
+export type AspirationStatus = 'Pending' | 'Approved' | 'Rejected' | 'Archived';
 
 export interface Aspiration {
   id: string;
