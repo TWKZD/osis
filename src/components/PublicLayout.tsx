@@ -2,10 +2,12 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { motion } from 'motion/react';
 import Navbar from './Navbar';
+import WelcomeSplash from './WelcomeSplash';
 
 export default function PublicLayout() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
+      <WelcomeSplash />
       <Navbar />
       <motion.main 
         initial={{ opacity: 0, y: 10 }}

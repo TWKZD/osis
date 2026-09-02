@@ -20,8 +20,8 @@ export default function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<PublicLayout />}>
-            <Route index element={<PapanAspirasi />} />
-            <Route path="kirim" element={<KirimAspirasi />} />
+            <Route index element={<KirimAspirasi />} />
+            <Route path="papan" element={<PapanAspirasi />} />
             <Route path="mading" element={<Mading />} />
           </Route>
 
