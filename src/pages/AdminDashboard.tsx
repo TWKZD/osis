@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
-import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp, PieChart as PieChartIcon } from 'lucide-react';
+import { Check, X, MessageCircleReply, Trash2, ChevronDown, ChevronUp, PieChart as PieChartIcon, Menu } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useSearchParams } from 'react-router-dom';
 
 export default function AdminDashboard() {
   const { aspirations, updateAspirationStatus, addResponse, deleteAspiration, announcements, addAnnouncement, deleteAnnouncement, aiConfig, updateAiConfig } = useAppContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'aspirasi';
+  const setActiveTab = (tab: string) => setSearchParams({ tab });
+  
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
-  const [activeTab, setActiveTab] = useState<'aspirasi' | 'mading' | 'ai'>('aspirasi');
+  const [isMobileTabOpen, setIsMobileTabOpen] = useState(false);
+  
+  useEffect(() => {
+    if (activeTab === 'ai') {
+      setAiPersonality(aiConfig.personality);
+      setAiKnowledge(aiConfig.knowledge);
+      setAiProviders(aiConfig.providers || []);
+    }
+  }, [activeTab, aiConfig]);
+
   
   // Announcement form state
   const [madingTitle, setMadingTitle] = useState('');
@@ -132,41 +146,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl max-w-lg">
-        <button
-          onClick={() => setActiveTab('aspirasi')}
-          className={cn(
-            "w-full py-2.5 text-sm font-bold rounded-lg transition-all",
-            activeTab === 'aspirasi' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
-          )}
-        >
-          Aspirasi Masuk
-        </button>
-        <button
-          onClick={() => setActiveTab('mading')}
-          className={cn(
-            "w-full py-2.5 text-sm font-bold rounded-lg transition-all",
-            activeTab === 'mading' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
-          )}
-        >
-          Kelola Mading
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab('ai');
-            setAiPersonality(aiConfig.personality);
-            setAiKnowledge(aiConfig.knowledge);
-            setAiProviders(aiConfig.providers || []);
-          }}
-          className={cn(
-            "w-full py-2.5 text-sm font-bold rounded-lg transition-all",
-            activeTab === 'ai' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
-          )}
-        >
-          Pengaturan AI
-        </button>
-      </div>
+
 
       {activeTab === 'aspirasi' ? (
         /* Aspirations List */

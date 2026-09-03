@@ -21,14 +21,17 @@ async function startServer() {
       const baseUrl = provider?.baseUrl || "https://api.groq.com/openai/v1/chat/completions";
       const model = provider?.model || "openai/gpt-oss-20b";
 
-      const response = await fetch(baseUrl, {
+      const fetchUrl = baseUrl || "https://api.groq.com/openai/v1/chat/completions";
+      const fetchModel = model || "openai/gpt-oss-20b";
+      
+      const response = await fetch(fetchUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
+          "Authorization": `Bearer ${apiKey.trim()}`
         },
         body: JSON.stringify({
-          model: model,
+          model: fetchModel.trim(),
           messages: messages,
           stream: false
         })
@@ -36,7 +39,8 @@ async function startServer() {
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`API error ${response.status}: ${errText}`);
+        console.error("Upstream API Error:", response.status, errText);
+        throw new Error(`Gagal menghubungi AI (${response.status}). Periksa kembali API Key dan Base URL Anda. Detail: ${errText.substring(0, 100)}`);
       }
 
       const data = await response.json();
