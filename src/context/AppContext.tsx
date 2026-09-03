@@ -23,7 +23,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [aiConfig, setAiConfig] = useState<AiConfig>({
     personality: 'Kamu adalah OSIS ASISTEN, asisten pintar dari OSIS Sangsaka SMAN 1 Kemangkon. Kamu ramah, asyik, gaul, membantu, dan tidak kaku.',
-    knowledge: 'Ulang tahun SMAN 1 Kemangkon (HUT SMAN 1 Kemangkon) diadakan pada tanggal yang ditetapkan oleh sekolah (harap sesuaikan di pengaturan).'
+    knowledge: 'Ulang tahun SMAN 1 Kemangkon (HUT SMAN 1 Kemangkon) diadakan pada tanggal yang ditetapkan oleh sekolah (harap sesuaikan di pengaturan).',
+    providers: [
+      {
+        id: '1',
+        name: 'Groq',
+        baseUrl: 'https://api.groq.com/openai/v1/chat/completions',
+        apiKey: '',
+        model: 'openai/gpt-oss-20b',
+        isActive: true
+      }
+    ]
   });
 
   useEffect(() => {

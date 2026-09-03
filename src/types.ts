@@ -13,9 +13,19 @@ export interface Aspiration {
   response?: string;
 }
 
+export interface AiProviderConfig {
+  id: string;
+  name: string;
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  isActive: boolean;
+}
+
 export interface AiConfig {
   personality: string;
   knowledge: string;
+  providers: AiProviderConfig[];
 }
 
 export interface Announcement {

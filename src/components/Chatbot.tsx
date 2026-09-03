@@ -46,12 +46,25 @@ export default function Chatbot() {
         ...newMessages
       ];
 
+      const activeProvider = aiConfig.providers?.find(p => p.isActive) || {
+        baseUrl: 'https://api.groq.com/openai/v1/chat/completions',
+        apiKey: '',
+        model: 'openai/gpt-oss-20b'
+      };
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: messagesWithSystem }),
+        body: JSON.stringify({ 
+          messages: messagesWithSystem,
+          provider: {
+            baseUrl: activeProvider.baseUrl,
+            apiKey: activeProvider.apiKey,
+            model: activeProvider.model
+          }
+        }),
       });
 
       if (!response.ok) {

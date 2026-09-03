@@ -11,20 +11,24 @@ async function startServer() {
   // API route for Chatbot
   app.post("/api/chat", async (req, res) => {
     try {
-      if (!process.env.GROQ_API_KEY) {
-        throw new Error("API Key tidak dikonfigurasi. Harap atur GROQ_API_KEY di Vercel/Environment Variables.");
+      const { messages, provider } = req.body;
+
+      const apiKey = provider?.apiKey || process.env.GROQ_API_KEY;
+      if (!apiKey) {
+        throw new Error("API Key tidak dikonfigurasi. Harap atur API Key di Panel Admin atau Vercel Environment Variables.");
       }
 
-      const { messages } = req.body;
+      const baseUrl = provider?.baseUrl || "https://api.groq.com/openai/v1/chat/completions";
+      const model = provider?.model || "openai/gpt-oss-20b";
 
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      const response = await fetch(baseUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b",
+          model: model,
           messages: messages,
           stream: false
         })
