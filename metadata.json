@@ -1,5 +1,5 @@
 {
-  "name": "Kotak Curhat OSIS",
+  "name": "kotak-curhat-osis",
   "description": "Aplikasi Kotak Curhat dan Aspirasi Siswa untuk OSIS.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

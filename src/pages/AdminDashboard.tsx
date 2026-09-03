@@ -7,15 +7,25 @@ import { cn } from '../lib/utils';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function AdminDashboard() {
-  const { aspirations, updateAspirationStatus, addResponse, deleteAspiration, announcements, addAnnouncement, deleteAnnouncement } = useAppContext();
+  const { aspirations, updateAspirationStatus, addResponse, deleteAspiration, announcements, addAnnouncement, deleteAnnouncement, aiConfig, updateAiConfig } = useAppContext();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
-  const [activeTab, setActiveTab] = useState<'aspirasi' | 'mading'>('aspirasi');
+  const [activeTab, setActiveTab] = useState<'aspirasi' | 'mading' | 'ai'>('aspirasi');
   
   // Announcement form state
   const [madingTitle, setMadingTitle] = useState('');
   const [madingContent, setMadingContent] = useState('');
   const [isAddingMading, setIsAddingMading] = useState(false);
+
+  // AI settings form state
+  const [aiPersonality, setAiPersonality] = useState(aiConfig.personality);
+  const [aiKnowledge, setAiKnowledge] = useState(aiConfig.knowledge);
+  const [isSavingAi, setIsSavingAi] = useState(false);
+
+  // Pagination & Filtering state
+  const [aspirationFilter, setAspirationFilter] = useState<'Pending' | 'Approved' | 'Rejected'>('Pending');
+  const [aspirationPage, setAspirationPage] = useState(1);
+  const itemsPerPage = 20;
 
   const stats = {
     total: aspirations.length,
@@ -118,7 +128,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl max-w-sm">
+      <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl max-w-lg">
         <button
           onClick={() => setActiveTab('aspirasi')}
           className={cn(
@@ -137,20 +147,62 @@ export default function AdminDashboard() {
         >
           Kelola Mading
         </button>
+        <button
+          onClick={() => {
+            setActiveTab('ai');
+            setAiPersonality(aiConfig.personality);
+            setAiKnowledge(aiConfig.knowledge);
+          }}
+          className={cn(
+            "w-full py-2.5 text-sm font-bold rounded-lg transition-all",
+            activeTab === 'ai' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+          )}
+        >
+          Pengaturan AI
+        </button>
       </div>
 
       {activeTab === 'aspirasi' ? (
         /* Aspirations List */
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 sm:px-8 border-b border-slate-200 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-slate-900">Daftar Aspirasi Terbaru</h2>
+          <div className="p-6 sm:px-8 border-b border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Daftar Aspirasi</h2>
+            {/* Sub-tabs for Aspirasi */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => { setAspirationFilter('Pending'); setAspirationPage(1); }}
+                className={cn("px-4 py-2 text-sm font-bold rounded-xl transition-all", aspirationFilter === 'Pending' ? "bg-amber-100 text-amber-800" : "bg-slate-50 text-slate-500 hover:bg-slate-100")}
+              >
+                Menunggu ({stats.pending})
+              </button>
+              <button
+                onClick={() => { setAspirationFilter('Approved'); setAspirationPage(1); }}
+                className={cn("px-4 py-2 text-sm font-bold rounded-xl transition-all", aspirationFilter === 'Approved' ? "bg-green-100 text-green-800" : "bg-slate-50 text-slate-500 hover:bg-slate-100")}
+              >
+                Disetujui ({stats.approved})
+              </button>
+              <button
+                onClick={() => { setAspirationFilter('Rejected'); setAspirationPage(1); }}
+                className={cn("px-4 py-2 text-sm font-bold rounded-xl transition-all", aspirationFilter === 'Rejected' ? "bg-red-100 text-red-800" : "bg-slate-50 text-slate-500 hover:bg-slate-100")}
+              >
+                Ditolak ({stats.rejected})
+              </button>
+            </div>
           </div>
           
           <div className="divide-y divide-slate-100">
-          {aspirations.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">Belum ada aspirasi masuk.</div>
-          ) : (
-            aspirations.map((aspiration) => (
+          {(() => {
+            const filtered = aspirations.filter(a => a.status === aspirationFilter);
+            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+            const paginated = filtered.slice((aspirationPage - 1) * itemsPerPage, aspirationPage * itemsPerPage);
+
+            if (filtered.length === 0) {
+              return <div className="p-12 text-center text-slate-500">Belum ada aspirasi di kategori ini.</div>;
+            }
+
+            return (
+              <>
+                {paginated.map((aspiration) => (
               <div key={aspiration.id} className="p-6 sm:px-8 hover:bg-slate-50/50 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                   <div className="flex-1">
@@ -279,11 +331,38 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </div>
-            ))
-          )}
+            ))}
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="p-6 border-t border-slate-200 flex items-center justify-between">
+                    <span className="text-sm text-slate-500">
+                      Halaman {aspirationPage} dari {totalPages} ({filtered.length} aspirasi)
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setAspirationPage(p => Math.max(1, p - 1))}
+                        disabled={aspirationPage === 1}
+                        className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-700 rounded-xl disabled:opacity-50 transition-all hover:bg-slate-200"
+                      >
+                        Sebelumnya
+                      </button>
+                      <button
+                        onClick={() => setAspirationPage(p => Math.min(totalPages, p + 1))}
+                        disabled={aspirationPage === totalPages}
+                        className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-700 rounded-xl disabled:opacity-50 transition-all hover:bg-slate-200"
+                      >
+                        Selanjutnya
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
+          </div>
         </div>
-      </div>
-      ) : (
+      ) : activeTab === 'mading' ? (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-slate-900">Kelola Pengumuman Mading</h2>
@@ -363,7 +442,56 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      )}
+      ) : activeTab === 'ai' ? (
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6 sm:px-8 border-b border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900">Pengaturan Chatbot AI</h2>
+            <p className="text-sm text-slate-500 mt-1">Ubah nama, kepribadian, dan pengetahuan tambahan untuk Chatbot OSIS.</p>
+          </div>
+          <div className="p-6 sm:px-8">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setIsSavingAi(true);
+              await updateAiConfig({
+                personality: aiPersonality,
+                knowledge: aiKnowledge
+              });
+              setIsSavingAi(false);
+              alert("Pengaturan AI berhasil disimpan!");
+            }} className="space-y-6 max-w-2xl">
+              <div>
+                <label className="block text-sm font-bold text-slate-900 mb-2">Kepribadian & Instruksi (System Prompt)</label>
+                <textarea
+                  value={aiPersonality}
+                  onChange={(e) => setAiPersonality(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all resize-y min-h-[120px]"
+                  placeholder="Contoh: Kamu adalah OSIS ASISTEN..."
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-900 mb-2">Informasi Tambahan / Pengetahuan AI</label>
+                <p className="text-xs text-slate-500 mb-2">Tambahkan fakta seputar sekolah, jadwal event, HUT, dll.</p>
+                <textarea
+                  value={aiKnowledge}
+                  onChange={(e) => setAiKnowledge(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all resize-y min-h-[160px]"
+                  placeholder="Contoh: HUT SMAN 1 Kemangkon diadakan setiap tanggal 12 Agustus..."
+                />
+              </div>
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={isSavingAi}
+                  className="px-6 py-2.5 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-700 transition-colors disabled:opacity-50"
+                >
+                  {isSavingAi ? "Menyimpan..." : "Simpan Pengaturan AI"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

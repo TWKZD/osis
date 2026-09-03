@@ -28,11 +28,13 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
-                  location.pathname === '/' ? "bg-sky-50 text-sky-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  "px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm border",
+                  location.pathname === '/' 
+                    ? "bg-sky-500 text-white border-sky-600 shadow-sky-500/20" 
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
-                <MessageSquarePlus className="w-4 h-4" />
+                <MessageSquarePlus className="w-4 h-4 inline-block mr-2" />
                 <span className="hidden sm:inline">Kirim Aspirasi</span>
               </motion.div>
             </Link>
@@ -41,26 +43,29 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
-                  location.pathname === '/papan' ? "bg-sky-50 text-sky-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  "px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm border",
+                  location.pathname === '/papan' 
+                    ? "bg-sky-500 text-white border-sky-600 shadow-sky-500/20" 
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
-                <MessageSquare className="w-4 h-4" />
+                <MessageSquare className="w-4 h-4 inline-block mr-2" />
                 <span className="hidden sm:inline">Papan Aspirasi</span>
               </motion.div>
             </Link>
-            <div className="h-6 w-px bg-slate-200 mx-2"></div>
             <Link to="/mading">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
-                  location.pathname === '/mading' ? "bg-sky-50 text-sky-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  "px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm border",
+                  location.pathname === '/mading' 
+                    ? "bg-sky-500 text-white border-sky-600 shadow-sky-500/20" 
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
-                <Megaphone className="w-4 h-4" />
-                <span className="hidden sm:inline">Mading</span>
+                <Megaphone className="w-4 h-4 inline-block mr-2" />
+                <span className="hidden sm:inline">Mading OSIS</span>
               </motion.div>
             </Link>
           </div>

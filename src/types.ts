@@ -13,6 +13,11 @@ export interface Aspiration {
   response?: string;
 }
 
+export interface AiConfig {
+  personality: string;
+  knowledge: string;
+}
+
 export interface Announcement {
   id: string;
   title: string;

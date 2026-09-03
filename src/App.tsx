@@ -13,6 +13,7 @@ import Mading from './pages/Mading';
 import AdminLayout from './components/AdminLayout';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Chatbot from './components/Chatbot';
 
 export default function App() {
   useEffect(() => {
@@ -60,6 +61,7 @@ export default function App() {
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Chatbot />
       </BrowserRouter>
     </AppProvider>
   );

@@ -13,5 +13,9 @@ service cloud.firestore {
     match /announcements/{document=**} {
       allow read, write: if true;
     }
+    
+    match /settings/{document=**} {
+      allow read, write: if true;
+    }
   }
 }
